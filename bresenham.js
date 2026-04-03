@@ -76,3 +76,27 @@ function llenarTabla(pasos) {
 		fila.insertCell().innerText = p.e2;
 	});
 }
+function llenarTabla(pasos) {
+    const tabla = document.getElementById("tabla");
+
+    // Limpiar tabla excepto encabezado
+    tabla.innerHTML = `
+        <tr>
+            <th>Paso</th>
+            <th>x</th>
+            <th>y</th>
+            <th>err</th>
+            <th>e2</th>
+        </tr>
+    `;
+
+    pasos.forEach(p => {
+        let fila = tabla.insertRow();
+
+        fila.insertCell().innerText = p.paso;
+        fila.insertCell().innerText = p.x;
+        fila.insertCell().innerText = p.y;
+        fila.insertCell().innerText = p.err;
+        fila.insertCell().innerText = p.e2;
+    });
+}
