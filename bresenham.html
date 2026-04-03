@@ -1,38 +1,74 @@
 <!DOCTYPE html>
 <html lang="es">
-    <head> 
-        <tittle> Bresenham app</tittle>
-        <style> 
-            body {font-family: arial;}
-             canvas { border: 1px solid black; }
-              table, th, td {
+  <head>
+    <tittle> Bresenham app</tittle>
+    <style>
+      body {
+        font-family: arial;
+      }
+
+      canvas {
+        border: 1px solid black;
+      }
+
+      table,
+      th,
+      td {
         border: 1px solid black;
         border-collapse: collapse;
         padding: 4px;
-              } 
-
-         </style>
-     </head>
-                    <body> 
-                 <h2>Algoritmo de Bresenham</h2>
-                    <label>x0: <input type="number" id="x0"></label>
-                    <label>y0: <input type="number" id="y0"></label>
-                    <label>x1: <input type="number" id="x1"></label>
-                    <label>y1: <input type="number" id="y1"></label>
-                    <button onclick="dibujar()">Dibujar línea</button>
-                    <br><br> 
-                    <canvas id="canvas" width="400" height="400"></canvas>
-
-<h3>Tabla de iteraciones</h3>
-<table id="tabla">
-    <tr>
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Algoritmo de Bresenham</h2>
+    <label>x0: <input type="number" id="x0">
+    </label>
+    <label>y0: <input type="number" id="y0">
+    </label>
+    <label>x1: <input type="number" id="x1">
+    </label>
+    <label>y1: <input type="number" id="y1">
+    </label>
+    <button onclick="dibujar()">Dibujar línea</button>
+    <br>
+    <br>
+    <canvas id="canvas" width="400" height="400"></canvas>
+    <h3>Tabla de iteraciones</h3>
+    <table id="tabla">
+      <tr>
         <th>Paso</th>
         <th>x</th>
         <th>y</th>
         <th>err</th>
         <th>e2</th>
-    </tr>
-</table>
-<script src="app.js"></script>
-     </body>
+      </tr>
+    </table>
+    <script src="app.js"></script>
+    <script>
+      const canvas = document.getElementById("canvas");
+      const ctx = canvas.getContext("2d");
+      const escala = 20; // tamaño de cada celda
+      function dibujarEjes() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = "#ccc";
+        // Líneas verticales
+        for (let x = 0; x < canvas.width; x += escala) {
+          ctx.beginPath();
+          ctx.moveTo(x, 0);
+          ctx.lineTo(x, canvas.height);
+          ctx.stroke();
+          ctx.fillText(x / escala, x, canvas.height - 5);
+        }
+        // Líneas horizontales
+        for (let y = 0; y < canvas.height; y += escala) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(canvas.width, y);
+          ctx.stroke();
+          ctx.fillText(y / escala, 0, y);
+        }
+      }
+    </script>
+  </body>
 </html>
