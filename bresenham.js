@@ -76,27 +76,16 @@ function llenarTabla(pasos) {
 		fila.insertCell().innerText = p.e2;
 	});
 }
-function llenarTabla(pasos) {
-    const tabla = document.getElementById("tabla");
+function dibujar() {
 
-    // Limpiar tabla excepto encabezado
-    tabla.innerHTML = `
-        <tr>
-            <th>Paso</th>
-            <th>x</th>
-            <th>y</th>
-            <th>err</th>
-            <th>e2</th>
-        </tr>
-    `;
+    let x0 = parseInt(document.getElementById("x0").value);
+    let y0 = parseInt(document.getElementById("y0").value);
+    let x1 = parseInt(document.getElementById("x1").value);
+    let y1 = parseInt(document.getElementById("y1").value);
 
-    pasos.forEach(p => {
-        let fila = tabla.insertRow();
+    dibujarEjes();
 
-        fila.insertCell().innerText = p.paso;
-        fila.insertCell().innerText = p.x;
-        fila.insertCell().innerText = p.y;
-        fila.insertCell().innerText = p.err;
-        fila.insertCell().innerText = p.e2;
-    });
+    let pasos = bresenham(x0, y0, x1, y1, plot);
+
+    llenarTabla(pasos);
 }
