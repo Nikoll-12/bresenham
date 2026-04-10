@@ -1,8 +1,30 @@
 /**
- * Dibuja un "pixel" como un cuadrado escalado
- * @param {number} x 
- * @param {number} y 
+ * Se agrega el ctx para graficar el canvas
  */
+const canvas = document.getElementById("canvas");
+const ctx    = canvas.getContext("2d");
+const escala = 20;
+/**
+ * Implemento función que dibuja los ejes y la cuadricula cada vez que se dibuja una nueva linea 
+ */
+function dibujarEjes() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.strokeStyle = "#ccc";
+    for (let x = 0; x < canvas.width; x += escala) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+        ctx.stroke();
+        ctx.fillText(x / escala, x, canvas.height - 5);
+    }
+    for (let y = 0; y < canvas.height; y += escala) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+        ctx.fillText(y / escala, 0, y);
+    }
+}
 function plot(x, y) {
 	ctx.fillStyle = "black";
 	ctx.fillRect(x * escala, y * escala, escala, escala);
