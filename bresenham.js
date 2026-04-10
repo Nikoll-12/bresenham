@@ -236,6 +236,37 @@ function llenarTabla(pasos) {
  * @param {number} x1 - Coordenada X final leída desde el campo de texto.
  * @param {number} y1 - Coordenada Y final leída desde el campo de texto.
  */
+/**
+ * Limpia el canvas borrando todos los píxeles dibujados y
+ * restaura la grilla con los ejes cartesianos.
+ * También reinicia la tabla de iteraciones a su estado inicial
+ * sin filas de datos y limpia los campos de entrada.
+ * @param {number} x0 - Coordenada X inicial que se borra del campo de texto.
+ * @param {number} y0 - Coordenada Y inicial que se borra del campo de texto.
+ * @param {number} x1 - Coordenada X final que se borra del campo de texto.
+ * @param {number} y1 - Coordenada Y final que se borra del campo de texto.
+ */
+function limpiarCanvas() {
+    // Limpiar el canvas y redibujar la grilla con los ejes cartesianos
+    dibujarEjes();
+
+    // Reiniciar la tabla dejando solo el encabezado
+    const tabla = document.getElementById("tabla");
+    tabla.innerHTML = `
+        <tr>
+            <th>Paso</th>
+            <th>x</th>
+            <th>y</th>
+            <th>err</th>
+            <th>e2</th>
+        </tr>`;
+
+    // Limpiar los campos de entrada
+    document.getElementById("x0").value = "";
+    document.getElementById("y0").value = "";
+    document.getElementById("x1").value = "";
+    document.getElementById("y1").value = "";
+}
 function dibujar() {
 //Leer coordenadas desde los campos de texto// 
     let x0 = parseInt(document.getElementById("x0").value);
