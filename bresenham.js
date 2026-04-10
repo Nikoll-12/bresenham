@@ -102,10 +102,50 @@ ctx.beginPath();
     // Restablecer grosor de línea
     ctx.lineWidth = 1;
 }
+/**
+ * Dibuja una punta de flecha en la posición (x, y) apuntando
+ * hacia la dirección indicada.
+ * @param {number} x          - Coordenada X en píxeles donde se dibuja la flecha.
+ * @param {number} y          - Coordenada Y en píxeles donde se dibuja la flecha.
+ * @param {string} direccion  - Dirección de la flecha: "derecha" o "arriba".
+ */
+
+function dibujarFlecha(x, y, direccion) {
+    // Tamaño de la cabeza de la flecha en píxeles
+    const tam = 7;
+
+    ctx.beginPath();
+
+    if (direccion === "derecha") {
+        // Punta mirando a la derecha
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - tam, y - tam / 2);
+        ctx.lineTo(x - tam, y + tam / 2);
+    } else if (direccion === "arriba") {
+        // Punta mirando hacia arriba
+        ctx.moveTo(x, y);
+        ctx.lineTo(x - tam / 2, y + tam);
+        ctx.lineTo(x + tam / 2, y + tam);
+    }
+
+    ctx.closePath();
+    ctx.fill();
+}
+/**
+ * Dibuja un "píxel" como un cuadrado escalado sobre el canvas.
+ * Convierte coordenadas de grilla (origen abajo-izquierda) a
+ * coordenadas de canvas (origen arriba-izquierda).
+ * @param {number} x - Coordenada X en unidades de grilla.
+ * @param {number} y - Coordenada Y en unidades de grilla.
+ */
 
 function plot(x, y) {
-	ctx.fillStyle = "black";
-	ctx.fillRect(x * escala, y * escala, escala, escala);
+ // Desplazar por margen izquierdo e invertir eje Y
+    let xPx = MARGEN_IZQ + x * ESCALA;
+    let yPx  = (NUM_FILAS - y) * ESCALA;
+
+    ctx.fillStyle = "black";
+    ctx.fillRect(xPx, yPx, ESCALA, ESCALA);
 }
 /**
  * Implementación del algoritmo de líneas de Bresenham con registro de pasos.
@@ -119,11 +159,13 @@ function plot(x, y) {
  * @returns {Array}  pasos - Arreglo con el estado de cada iteración.
  */
 function bresenham(x0, y0, x1, y1, plot) {
+	//Calculo de diferencias y dirección del paso//
 	let dx = Math.abs(x1 - x0);
 	let dy = Math.abs(y1 - y0);
 	let sx = (x0 < x1) ? 1 : -1;
 	let sy = (y0 < y1) ? 1 : -1;
 	let err = dx - dy;
+
 	let pasos = [];
 	let paso = 0;
 	while (true) {
@@ -207,3 +249,5 @@ function dibujar() {
 
     llenarTabla(pasos);
 }
+// Dibujar los ejes al cargar la página
+dibujarEjes();
