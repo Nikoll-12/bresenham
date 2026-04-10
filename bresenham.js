@@ -3,54 +3,86 @@
  */
 const canvas = document.getElementById("canvas");
 const ctx    = canvas.getContext("2d");
-const escala = 20;
+//Constantes de configuración del canvas//
+const ESCALA     = 20; // Píxeles por celda de grilla
+const MARGEN_IZQ = 20; // Espacio reservado a la izquierda para etiquetas Y
+const MARGEN_INF = 20; // Espacio reservado abajo para etiquetas X
+// Número de celdas que caben en el área útil
+const NUM_COLS  = Math.floor((canvas.width  - MARGEN_IZQ) / ESCALA);
+const NUM_FILAS = Math.floor((canvas.height - MARGEN_INF) / ESCALA);
+/**
+ * Dibuja la grilla de fondo y las marcas de escala numérica.
+ * Las etiquetas del eje X aparecen en el margen inferior.
+ * Las etiquetas del eje Y aparecen en el margen izquierdo.
+ * El valor Y aumenta hacia arriba (convención matemática).
+ * @param {number} NUM_COLS   - Número de columnas visibles en la grilla.
+ * @param {number} NUM_FILAS  - Número de filas visibles en la grilla.
+ * @param {number} MARGEN_IZQ - Espacio en píxeles reservado al lado izquierdo.
+ * @param {number} MARGEN_INF - Espacio en píxeles reservado en la parte inferior.
+ * @param {number} ESCALA     - Tamaño en píxeles de cada celda de la grilla.
+ */ 
 /**
  * Implemento función que dibuja los ejes y la cuadricula cada vez que se dibuja una nueva linea 
  */
 function dibujarEjes() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height); //Tamaño del canvas// 
     ctx.strokeStyle = "#ccc";
-    for (let x = 0; x < canvas.width; x += escala) {
+	ctx.fillStyle   = "#333";
+    ctx.font        = "10px Arial";
+	// Líneas verticales + etiquetas del eje X
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "top";
+    for (let j = 0; j <= NUM_COLS; j++) {
+        let xPx = MARGEN_IZQ + j * ESCALA;
         ctx.beginPath();
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
+        ctx.moveTo(xPx, 0);
+        ctx.lineTo(xPx, NUM_FILAS * ESCALA);
         ctx.stroke();
-        ctx.fillText(x / escala, x, canvas.height - 5);
+        ctx.fillText(j, xPx, NUM_FILAS * ESCALA + 4);
     }
-    for (let y = 0; y < canvas.height; y += escala) {
+// Líneas horizontales + etiquetas del eje Y
+    ctx.textAlign    = "right";
+    ctx.textBaseline = "middle";
+    for (let i = 0; i <= NUM_FILAS; i++) {
+        let yPx = i * ESCALA;
         ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
+        ctx.moveTo(MARGEN_IZQ, yPx);
+        ctx.lineTo(MARGEN_IZQ + NUM_COLS * ESCALA, yPx);
         ctx.stroke();
-        ctx.fillText(y / escala, 0, y);
+        ctx.fillText(NUM_FILAS - i, MARGEN_IZQ - 3, yPx);
     }
+ // Dibujar los ejes cartesianos encima de la grilla
+    dibujarEjesCartesianos();
 }
 function plot(x, y) {
 	ctx.fillStyle = "black";
 	ctx.fillRect(x * escala, y * escala, escala, escala);
 }
 /**
- * Algoritmo de Bresenham con almacenamiento de pasos
+ * Implementación del algoritmo de líneas de Bresenham con registro de pasos.
+ * Traza la línea entre (x0, y0) y (x1, y1) dibujando cada punto y
+ * almacenando el estado de las variables internas en cada iteración.
+ * @param {number}   x0   - Coordenada X inicial.
+ * @param {number}   y0   - Coordenada Y inicial.
+ * @param {number}   x1   - Coordenada X final.
+ * @param {number}   y1   - Coordenada Y final.
+ * @param {Function} plot - Función para dibujar el píxel en (x, y).
+ * @returns {Array}  pasos - Arreglo con el estado de cada iteración.
  */
 function bresenham(x0, y0, x1, y1, plot) {
-
 	let dx = Math.abs(x1 - x0);
 	let dy = Math.abs(y1 - y0);
-
 	let sx = (x0 < x1) ? 1 : -1;
 	let sy = (y0 < y1) ? 1 : -1;
-
 	let err = dx - dy;
-
 	let pasos = [];
 	let paso = 0;
-
 	while (true) {
-
-		plot(x0, y0);
-
+//Dibujar el punto actual// 
+		plot(x0, y0); 
+		      // Calcular e2 para decisión y registro//
 		let e2 = 2 * err;
-
+// Registrar estado de todas las variables en este paso
 		pasos.push({
 			paso: paso++,
 			x: x0,
@@ -58,14 +90,14 @@ function bresenham(x0, y0, x1, y1, plot) {
 			err: err,
 			e2: e2
 		});
-
+   // Condición de finalización// 
 		if (x0 === x1 && y0 === y1) break;
-
+//Ajuste en el eje x//  
 		if (e2 > -dy) {
 			err -= dy;
 			x0 += sx;
 		}
-
+//Ajuste en el eje y// 
 		if (e2 < dx) {
 			err += dx;
 			y0 += sy;
@@ -74,37 +106,52 @@ function bresenham(x0, y0, x1, y1, plot) {
 
 	return pasos;
 }
+/**
+ * Llena la tabla HTML con los datos paso a paso del algoritmo.
+ * Limpia el contenido anterior antes de insertar las nuevas filas.
+ * @param {Array}  pasos       - Arreglo de objetos con el estado de cada paso.
+ * @param {number} pasos.paso  - Número de iteración actual.
+ * @param {number} pasos.x     - Coordenada X en la iteración actual.
+ * @param {number} pasos.y     - Coordenada Y en la iteración actual.
+ * @param {number} pasos.err   - Valor del error acumulado en la iteración actual.
+ * @param {number} pasos.e2    - Valor del doble del error (2 * err) en la iteración actual.
+ */
 function llenarTabla(pasos) {
 	const tabla = document.getElementById("tabla");
-
-	// Limpiar tabla excepto encabezado
-	tabla.innerHTML = `
+	 // Restablecer encabezado y eliminar filas anteriores
+    tabla.innerHTML = `
         <tr>
             <th>Paso</th>
             <th>x</th>
             <th>y</th>
             <th>err</th>
             <th>e2</th>
-        </tr>
-    `;
-
-	pasos.forEach(p => {
-		let fila = tabla.insertRow();
-
-		fila.insertCell().innerText = p.paso;
-		fila.insertCell().innerText = p.x;
-		fila.insertCell().innerText = p.y;
-		fila.insertCell().innerText = p.err;
-		fila.insertCell().innerText = p.e2;
-	});
+        </tr>`;
+	// Insertar una fila por cada iteración registrada
+    pasos.forEach(p => {
+        let fila = tabla.insertRow();
+        fila.insertCell().innerText = p.paso;
+        fila.insertCell().innerText = p.x;
+        fila.insertCell().innerText = p.y;
+        fila.insertCell().innerText = p.err;
+        fila.insertCell().innerText = p.e2;
+    });
 }
+/**
+ * Función principal: lee los inputs, valida, limpia el canvas,
+ * ejecuta el algoritmo de Bresenham y actualiza la tabla.
+ * @param {number} x0 - Coordenada X inicial leída desde el campo de texto.
+ * @param {number} y0 - Coordenada Y inicial leída desde el campo de texto.
+ * @param {number} x1 - Coordenada X final leída desde el campo de texto.
+ * @param {number} y1 - Coordenada Y final leída desde el campo de texto.
+ */
 function dibujar() {
-
+//Leer coordenadas desde los campos de texto// 
     let x0 = parseInt(document.getElementById("x0").value);
     let y0 = parseInt(document.getElementById("y0").value);
     let x1 = parseInt(document.getElementById("x1").value);
     let y1 = parseInt(document.getElementById("y1").value);
-
+//Validar que las coordenadas esten
     dibujarEjes();
 
     let pasos = bresenham(x0, y0, x1, y1, plot);
