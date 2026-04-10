@@ -54,6 +54,55 @@ function dibujarEjes() {
  // Dibujar los ejes cartesianos encima de la grilla
     dibujarEjesCartesianos();
 }
+/**
+ * Dibuja los ejes cartesianos X e Y sobre el canvas con flechas en sus extremos
+ * y la etiqueta de cada eje. El origen (0,0) se ubica en la esquina
+ * inferior izquierda del área de dibujo, respetando los márgenes definidos.
+ * @param {number} MARGEN_IZQ - Coordenada X en píxeles donde nace el eje Y.
+ * @param {number} NUM_FILAS  - Número de filas, define la base del eje X.
+ * @param {number} NUM_COLS   - Número de columnas, define el largo del eje X.
+ * @param {number} ESCALA     - Tamaño en píxeles de cada celda de la grilla.
+ */
+function dibujarEjesCartesianos() {
+    // Coordenadas del origen en píxeles
+    let origenX = MARGEN_IZQ;
+    let origenY = NUM_FILAS * ESCALA;
+
+    // Extremo derecho del eje X y extremo superior del eje Y
+    let finEjeX = MARGEN_IZQ + NUM_COLS * ESCALA;
+    let finEjeY = 0;
+
+    ctx.strokeStyle = "black";
+    ctx.fillStyle   = "black";
+    ctx.lineWidth   = 2;
+//Eje x// 
+	ctx.beginPath();
+    ctx.moveTo(origenX, origenY);
+    ctx.lineTo(finEjeX, origenY);
+    ctx.stroke();
+	// Flecha del eje X (punta derecha)
+    dibujarFlecha(finEjeX, origenY, "derecha");
+	ctx.font         = "bold 12px Arial";
+    ctx.textAlign    = "left";
+    ctx.textBaseline = "middle";
+    ctx.fillText("X", finEjeX + 8, origenY);
+	//Eje y//
+ctx.beginPath();
+    ctx.moveTo(origenX, origenY);
+    ctx.lineTo(origenX, finEjeY);
+    ctx.stroke();
+
+    // Flecha del eje Y (punta arriba)
+    dibujarFlecha(origenX, finEjeY, "arriba");
+	 ctx.font         = "bold 12px Arial";
+    ctx.textAlign    = "center";
+    ctx.textBaseline = "bottom";
+    ctx.fillText("Y", origenX, finEjeY - 4);
+
+    // Restablecer grosor de línea
+    ctx.lineWidth = 1;
+}
+
 function plot(x, y) {
 	ctx.fillStyle = "black";
 	ctx.fillRect(x * escala, y * escala, escala, escala);
